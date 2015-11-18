@@ -1,4 +1,5 @@
 # ausiasYield 2015
+  * this project is deprecated. Get rafaelaznar/openAUSIAS instead, please!
   * ausiasYield is a project to learn and develop openAusiàs
 
 ## openAusias
