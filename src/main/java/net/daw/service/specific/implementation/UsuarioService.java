@@ -77,7 +77,6 @@ public class UsuarioService extends TableServiceGenImpl {
                     oUsuario = oUserDao.getFromLogin(oUsuario);
                     if (oUsuario.getId() != 0) {
                         oRequest.getSession().setAttribute("userBean", oUsuario);
-                        strAnswer = oUsuario.getLogin();
                     } else {
                         strCode = "KO";
                     }
