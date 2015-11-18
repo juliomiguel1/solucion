@@ -74,10 +74,10 @@ public class ParameterCook {
 
     public static String prepareJson(HttpServletRequest request) {
         String result = null;
-        if (request.getParameter("json") == null) {
+        if (request.getParameter("control") == null) {
             result = "";
         } else {
-            result = request.getParameter("json").replaceAll("%2F", "/");
+            result = request.getParameter("control").replaceAll("%2F", "/");
         }
         return result;
     }

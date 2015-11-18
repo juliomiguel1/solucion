@@ -43,7 +43,7 @@ public class ConnectionClassHelper {
             return System.getenv("OPENSHIFT_APP_NAME");
 
         } else {
-            return "ausiasyield2015";
+            return "examen-serv-1ev-2015-2016";
             //return "openausiasblog";
             //return "openausias2015";
             //return "ausiasyield2014";
@@ -72,9 +72,9 @@ public class ConnectionClassHelper {
         if (ConnectionClassHelper.getOpenShift()) {
             //return System.getenv("OPENSHIFT_MYSQL_DB_PORT");
             //return System.getenv("OPENSHIFT_DIY_PORT");
-            return "3306";
+            return "3307";
         } else {
-            return "3306";
+            return "3307";
         }
     }
 

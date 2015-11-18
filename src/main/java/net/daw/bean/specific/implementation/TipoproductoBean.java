@@ -2,7 +2,7 @@
  * Copyright (c) 2015 by Rafael Angel Aznar Aparici (rafaaznar at gmail dot com)
  * 
  * openAUSIAS: The stunning micro-library that helps you to develop easily 
- *             AJAX web applications by using Java and jQuery
+ * AJAX web applications by using Java and jQuery
  * openAUSIAS is distributed under the MIT License (MIT)
  * Sources at https://github.com/rafaelaznar/openAUSIAS
  * 
@@ -23,19 +23,66 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
  */
-config = {
-    isAppInProductionMode: function () {
-        return false;
-    },
-    getAppName: function () {
-        var strPath = window.location.pathname;
-        return strPath.substr(1, strPath.substr(1, strPath.length).indexOf('/'));
-    },
-    getAppClientUrl: function () {
-        return location.protocol + '//' + location.hostname + ':' + location.port + '/' + this.getAppName();
-    }    ,
-    getAppUrl: function () {
-        return location.protocol + '//' + location.hostname + ':' + location.port + '/' + this.getAppName() + '/control';
+package net.daw.bean.specific.implementation;
+
+import com.google.gson.annotations.Expose;
+import net.daw.bean.generic.implementation.BeanGenImpl;
+import net.daw.bean.publicinterface.BeanInterface;
+import net.daw.helper.annotations.TableSourceMetaInformation;
+
+/**
+ *
+ * @author a020864288e
+ */
+@TableSourceMetaInformation(
+        TableName = "producto",
+        Description = "Usuarios del sistema"
+)
+
+public class TipoproductoBean extends BeanGenImpl implements BeanInterface{
+
+    public TipoproductoBean() {
+        this.id = 0;
     }
+
+    public TipoproductoBean(Integer id) {
+        this.id = id;
+    }
+    
+     @Expose
+     private Integer id;
+     
+       @Expose
+     private String descripcion;
+
+    /**
+     * @return the id
+     */
+    public Integer getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the descripcion
+     */
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    /**
+     * @param descripcion the descripcion to set
+     */
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+    
 }

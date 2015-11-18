@@ -28,168 +28,185 @@ package net.daw.dao.specific.implementation;
 
 import net.daw.dao.generic.implementation.TableDaoGenImpl;
 import java.sql.Connection;
-import net.daw.bean.specific.implementation.UsuarioBean;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import net.daw.bean.specific.implementation.CompraBean;
+import net.daw.bean.specific.implementation.ProductoBean;
+import net.daw.bean.specific.implementation.TipoproductoBean;
+import net.daw.bean.specific.implementation.UserBean;
+import net.daw.data.specific.implementation.MysqlDataSpImpl;
+//import net.daw.bean.specific.implementation.UsuarioBean;
 import net.daw.helper.statics.AppConfigurationHelper;
+import static net.daw.helper.statics.MetaEnum.FieldType.Date;
 
-public class UsuarioDao extends TableDaoGenImpl<UsuarioBean> {
+public class UsuarioDao extends TableDaoGenImpl<UserBean> {
 
     public UsuarioDao(Connection pooledConnection) throws Exception {
         super(pooledConnection);
 
     }
 
-    public UsuarioBean getFromLogin(UsuarioBean oUsuario) throws Exception {
+    public UserBean getFromLogin(UserBean oUsuarioBean) throws Exception {
         try {
-            String strId = oMysql.getId("usuario", "login", oUsuario.getLogin());
-            if (strId == null) {
-                oUsuario.setId(0);
-            } else {
-                Integer intId = Integer.parseInt(strId);
-                oUsuario.setId(intId);
-                String pass = oUsuario.getPassword();
-                oUsuario.setPassword(oMysql.getOne(strSqlSelectDataOrigin, "password", oUsuario.getId()));
-                if (!pass.equals(oUsuario.getPassword())) {
-                    oUsuario.setId(0);
+            ResultSet existe = oMysql.getAllSql("select * from usuario");
+            if (existe != null) {
+                while (existe.next()) {
+                    if (existe.getString("login").equals(oUsuarioBean.getLogin())) {
+
+                        Date fecha = existe.getDate("fnac");
+
+                        //BUG FECHAS SOLUCIONADO
+                        SimpleDateFormat formatter = new SimpleDateFormat("MM");
+                        String str_fecha = formatter.format(fecha);
+                        String nuevo = existe.getString("password") + str_fecha;
+                        if (nuevo.equals(oUsuarioBean.getPassword())) {
+                            oUsuarioBean.setId(existe.getInt("id"));
+                            oUsuarioBean.setNombre(existe.getString("nombre"));
+                            oUsuarioBean.setPrimerapellido(existe.getString("ape1"));
+                            oUsuarioBean.setSegundopellido(existe.getString("ape2"));
+                            oUsuarioBean.setSexo(existe.getInt("sexo"));
+                            oUsuarioBean.setFnac(existe.getDate("fnac"));
+
+                        }
+
+                    }
                 }
-                oUsuario = this.get(oUsuario, AppConfigurationHelper.getJsonDepth());
             }
-            return oUsuario;
+            return oUsuarioBean;
         } catch (Exception e) {
             throw new Exception("UsuarioDao.getFromLogin: Error: " + e.getMessage());
         }
     }
 
-//    @Override
-//    public UsuarioBeanGenSpImpl get(UsuarioBeanGenSpImpl oUsuarioBean, Integer expand) throws Exception {
-//        if (oUsuarioBean.getId() > 0) {
-//            try {
-//                if (!oMysql.existsOne(strTableOrigin, oUsuarioBean.getId())) {
-//                    oUsuarioBean.setId(0);
-//                } else {
-//                    expand--;
-//                    if (expand > 0) {
-//                        oUsuarioBean.setLogin(oMysql.getNewOne(strSqlSelectDataOrigin, "login", oUsuarioBean.getId()));
-//                        oUsuarioBean.setPassword(null);
-//                        oUsuarioBean.setCiudad(oMysql.getNewOne(strSqlSelectDataOrigin, "ciudad", oUsuarioBean.getId()));
-//                        oUsuarioBean.setFirma(oMysql.getNewOne(strSqlSelectDataOrigin, "firma", oUsuarioBean.getId()));
-//                        oUsuarioBean.setSkin(oMysql.getNewOne(strSqlSelectDataOrigin, "skin", oUsuarioBean.getId()));
-//
-//                        oUsuarioBean.setId_tipousuario(Integer.parseInt(oMysql.getOne(strTableOrigin, "id_tipousuario", oUsuarioBean.getId())));
-//                        oUsuarioBean.setId_estado(Integer.parseInt(oMysql.getOne(strTableOrigin, "id_estado", oUsuarioBean.getId())));
-//
-//                        TipousuarioBeanGenSpImpl oTipousuario = new TipousuarioBeanGenSpImpl();
-//                        oTipousuario.setId(Integer.parseInt(oMysql.getOne(strTableOrigin, "id_tipousuario", oUsuarioBean.getId())));
-//                        TipousuarioDaoGenSpImpl oTipousuarioDAO = new TipousuarioDaoGenSpImpl(oConnection);
-//                        oTipousuario = oTipousuarioDAO.get(oTipousuario, AppConfigurationHelper.getJsonDepth());
-//                        oUsuarioBean.setObj_tipousuario(oTipousuario);
-//
-//                        EstadoBeanGenSpImpl oEstado = new EstadoBeanGenSpImpl();
-//                        oEstado.setId(Integer.parseInt(oMysql.getOne(strTableOrigin, "id_estado", oUsuarioBean.getId())));
-//                        EstadoDaoGenSpImpl oEstadoDAO = new EstadoDaoGenSpImpl(oConnection);
-//                        oEstado = oEstadoDAO.get(oEstado, AppConfigurationHelper.getJsonDepth());
-//                        oUsuarioBean.setObj_estado(oEstado);
-//                    }
-//                }
-//            } catch (Exception ex) {
-//                ExceptionBooster.boost(new Exception(this.getClass().getName() + ":get ERROR: " + ex.getMessage()));
-//            }
-//        } else {
-//            oUsuarioBean.setId(0);
-//        }
-//        return oUsuarioBean;
-//    }
-//
-//    @Override
-//    public UsuarioBeanGenSpImpl set(UsuarioBeanGenSpImpl oUsuarioBean) throws Exception {
-//        try {
-//            Boolean isNew = false;
-//
-//            if (oUsuarioBean.getId() == 0) {
-//                oUsuarioBean.setId(oMysql.insertOne(strTableOrigin));
-//                isNew = true;
-//            }
-//            oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "login", oUsuarioBean.getLogin());
-//            oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "id_tipousuario", oUsuarioBean.getId_tipousuario().toString());
-//            oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "id_estado", oUsuarioBean.getId_estado().toString());
-//            oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "ciudad", oUsuarioBean.getCiudad());
-//            oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "firma", oUsuarioBean.getFirma());
-//            oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "skin", oUsuarioBean.getSkin());
-//            String prueba = oUsuarioBean.getPassword();
-//
-//            if (isNew == false) {
-//                if (oUsuarioBean.getPassword() == null || oUsuarioBean.getPassword().equals("")) {
-//                    oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "password", oMysql.getOne(strTableOrigin, "password", oUsuarioBean.getId()));
-//                } else {
-//                    oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "password", oUsuarioBean.getPassword());
-//                }
-//            } else {
-//                oMysql.updateOne(oUsuarioBean.getId(), strTableOrigin, "password", oUsuarioBean.getPassword());
-//            }
-//        } catch (Exception ex) {
-//            ExceptionBooster.boost(new Exception(this.getClass().getName() + ":set ERROR: " + ex.getMessage()));
-//        }
-//        return oUsuarioBean;
-//    }
+    public UserBean change(UserBean oUsuarioBean) throws Exception {
+        MysqlDataSpImpl oMysql = new MysqlDataSpImpl(oConnection);
+        if (oUsuarioBean.getId() > 0) {
+            ResultSet existe = oMysql.getAllSql("select * from usuario");
+            if (existe != null) {
+                while (existe.next()) {
+                    if (existe.getInt("id") == oUsuarioBean.getId()) {
+                        oUsuarioBean.setId(existe.getInt("id"));
+                        oUsuarioBean.setNombre(existe.getString("nombre"));
+                        oUsuarioBean.setPrimerapellido(existe.getString("ape1"));
+                        oUsuarioBean.setSegundopellido(existe.getString("ape2"));
+                        oUsuarioBean.setSexo(existe.getInt("sexo"));
+                        oUsuarioBean.setFnac(existe.getDate("fnac"));
+                        oUsuarioBean.setLogin(existe.getString("login"));
+                        oUsuarioBean.setPassword(existe.getString("password"));
+                    }
+                }
+            }
+        }
 
-//    public UsuarioBean type(UsuarioBean oUsuarioBean) throws Exception {
-//
-//        try {
-//            AlumnoDao oAlumnoDao = new AlumnoDao();
-//            AlumnoBean oAlumnoBean = oAlumnoDao.getFromId_usuario(oUsuarioBean);
-//            oUsuarioBean.setTipoUsuario(Enum.TipoUsuario.Alumno);
-//        } catch (Exception e1) {
-//            try {
-//                EmpresaDao oEmpresaDao = new EmpresaDao();
-//                EmpresaBean oEmpresaBean = oEmpresaDao.getFromId_usuario(oUsuarioBean);
-//                oUsuarioBean.setTipoUsuario(Enum.TipoUsuario.Empresa);
-//            } catch (Exception e2) {
-//                try {
-//                    ProfesorDao oProfesorDao = new ProfesorDao();
-//                    ProfesorBean oProfesorBean = oProfesorDao.getFromId_usuario(oUsuarioBean);
-//                    oUsuarioBean.setTipoUsuario(Enum.TipoUsuario.Profesor);
-//                } catch (Exception e3) {
-//                    throw new Exception("UsuarioDao.type: Error: " + e3.getMessage());
-//                }
-//            }
-//        } finally {
-//            oMysql.desconexion();
-//        }
-//        return oUsuarioBean;
-//    }
-//    @Override
-//    public UsuarioBean get(UsuarioBean oUsuarioBean) throws Exception {
-//        if (oUsuarioBean.getId() > 0) {
-//            try {
-//                oMysql.conexion(enumTipoConexion);
-//                if (!oMysql.existsOne("usuario", oUsuarioBean.getId())) {
-//                    oUsuarioBean.setId(0);
-//                } else {
-//                    oUsuarioBean.setLogin(oMysql.getOne("usuario", "login", oUsuarioBean.getId()));
-//                    oUsuarioBean.setPassword(oMysql.getOne("usuario", "password", oUsuarioBean.getId()));
-//                }
-//            } catch (Exception e) {
-//                throw new Exception("UsuarioDao.getUsuario: Error: " + e.getMessage());
-//            } finally {
-//                oMysql.desconexion();
-//            }
-//        } else {
-//            oUsuarioBean.setId(0);
-//        }
-//        return oUsuarioBean;
-//    }
-//
-//
-//    @Override
-//    public String getDescription(int id) throws Exception {
-//        UsuarioBean oUsuarioBean = new UsuarioBean();
-//        oUsuarioBean.setId(id);
-//        oUsuarioBean = this.get(oUsuarioBean);
-//        String description;
-//        if (oUsuarioBean.getLogin().length() > 20) {
-//            description = oUsuarioBean.getLogin().substring(0, 19) + "...";
-//        } else {
-//            description = oUsuarioBean.getLogin();
-//        }
-//        return description;
-//    }
+        return oUsuarioBean;
+    }
+
+    public int removeproducto(int id) throws Exception {
+
+        ResultSet existe = oMysql.getAllSql("select * from producto");
+        int contadorproducto = 0;
+        if (existe != null) {
+            while (existe.next()) {
+                if (existe.getInt("id_tipoproducto") == id) {
+                    oMysql.removeOne(existe.getInt("id"), "producto");
+                    contadorproducto++;
+
+                }
+
+            }
+        }
+
+        return contadorproducto;
+    }
+
+    public int removetipoproducto(int id) throws Exception {
+
+        ResultSet existeproducto = oMysql.getAllSql("select * from producto");
+        int contadorproducto = 0;
+        if (existeproducto != null) {
+            while (existeproducto.next()) {
+                ResultSet existe = oMysql.getAllSql("select * from compra");
+                if (existe != null) {
+                    while (existe.next()) {
+                        if (existeproducto.getInt("id") == existe.getInt("id_producto") && existeproducto.getInt("id_tipoproducto") == id) {
+                            oMysql.removeOne(existe.getInt("id"), "compra");
+                            contadorproducto++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return contadorproducto;
+    }
+
+    public ArrayList<Integer> duplicado() throws Exception {
+
+        ArrayList<Integer> alUserBean = new ArrayList<>();
+
+        ResultSet existe = oMysql.getAllSql("select * from usuario");
+        int cont = 0;
+        if (existe != null) {
+            while (existe.next()) {
+                ResultSet nuevo = oMysql.getAllSql("select * from usuario");
+                cont=0;
+                if (nuevo != null) {
+                    while (nuevo.next()) {
+                        if (existe.getString("nombre").equals(nuevo.getString("nombre")) && existe.getString("ape1").equals(nuevo.getString("ape1")) && existe.getString("ape2").equals(nuevo.getString("ape2"))) {
+                            cont++;
+                            if(cont>=2){
+                                alUserBean.add(existe.getInt("id"));
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        return alUserBean;
+
+    }
+
+    public CompraBean comprar(CompraBean oCompraBean) throws Exception {
+
+        MysqlDataSpImpl oMysql = new MysqlDataSpImpl(oConnection);
+
+        ResultSet existe = oMysql.getAllSql("select * from producto");
+        if (existe != null) {
+            while (existe.next()) {
+                if (oCompraBean.getId_producto() == existe.getInt("id") && oCompraBean.getCantidad() <= 1000) {
+                    if (oCompraBean.getId() == 0) {
+                        oCompraBean.setId(oMysql.insertOne("compra"));
+                    }
+                    oMysql.updateOne(oCompraBean.getId(), "compra", "id", oCompraBean.getId().toString());
+                    oMysql.updateOne(oCompraBean.getId(), "compra", "id_producto", oCompraBean.getId_producto().toString());
+                    oMysql.updateOne(oCompraBean.getId(), "compra", "id_usuario", oCompraBean.getId_usuario().toString());
+                    oMysql.updateOne(oCompraBean.getId(), "compra", "cantidad", oCompraBean.getCantidad().toString());
+                    Date date = new Date();
+                    //BUG FECHAS SOLUCIONADO
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                    oCompraBean.setFnac(date);
+                    String str_fecha = formatter.format(oCompraBean.getFnac());
+                    oMysql.updateOne(oCompraBean.getId(), "compra", "fnac", str_fecha);
+                }
+            }
+        }
+        return oCompraBean;
+    }
+
+    public ArrayList<String> tipocomprado(int id) throws Exception {
+        ArrayList<String> alarray = new ArrayList<String>();
+
+        ResultSet existe = oMysql.getAllSql("SELECT tipoproducto.descripcion as descripcion FROM producto, tipoproducto, compra WHERE tipoproducto.id = producto.id_tipoproducto AND producto.id = compra.id_producto AND compra.id_usuario=" + id);
+        if (existe != null) {
+            while (existe.next()) {
+                alarray.add(existe.getString("descripcion"));
+            }
+        }
+
+        return alarray;
+    }
 }

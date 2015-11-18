@@ -2,7 +2,7 @@
  * Copyright (c) 2015 by Rafael Angel Aznar Aparici (rafaaznar at gmail dot com)
  * 
  * openAUSIAS: The stunning micro-library that helps you to develop easily 
- *             AJAX web applications by using Java and jQuery
+ * AJAX web applications by using Java and jQuery
  * openAUSIAS is distributed under the MIT License (MIT)
  * Sources at https://github.com/rafaelaznar/openAUSIAS
  * 
@@ -23,19 +23,24 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
  */
-config = {
-    isAppInProductionMode: function () {
-        return false;
-    },
-    getAppName: function () {
-        var strPath = window.location.pathname;
-        return strPath.substr(1, strPath.substr(1, strPath.length).indexOf('/'));
-    },
-    getAppClientUrl: function () {
-        return location.protocol + '//' + location.hostname + ':' + location.port + '/' + this.getAppName();
-    }    ,
-    getAppUrl: function () {
-        return location.protocol + '//' + location.hostname + ':' + location.port + '/' + this.getAppName() + '/control';
+package net.daw.dao.specific.implementation;
+
+import java.sql.Connection;
+import net.daw.bean.specific.implementation.ProductoBean;
+import net.daw.bean.specific.implementation.UserBean;
+import net.daw.dao.generic.implementation.TableDaoGenImpl;
+
+/**
+ *
+ * @author a020864288e
+ */
+public class ProductoDao extends TableDaoGenImpl<ProductoBean> {
+
+    public ProductoDao(Connection pooledConnection) throws Exception {
+        super(pooledConnection);
+
     }
+    
 }
